@@ -9,6 +9,11 @@ class VtigerOperations {
 	private $username = "kchmela";
 	private $userAccessKey = "6Rk1D2ODBnHksWri";
 
+	private $challengeToken = "";
+	private $generatedKey = "";
+
+	private $sessionId = "";
+	private $userId = "";
 
 	public function __construct() {
 		//authentication
@@ -16,11 +21,31 @@ class VtigerOperations {
 		$jsonResponse = Zend_JSON::decode($response);
 
 		if($jsonResponse['success']==false)
-            //handle the failure case.
             die('getchallenge failed:'.$jsonResponse['error']['errorMsg']);
 
-        print_r($jsonResponse);
+        $this->challengeToken = $jsonResponse['result']['token'];
+        $this->generatedKey = md5($this->challengeToken.$this->userAccessKey);
 
+
+        $post_params = array(
+        	'operation' => 'login',
+        	'username' => $this->username,
+        	'accessKey' => $this->generatedKey);
+
+        $response = file_get_contents($this->endpointUrl, false, stream_context_create(array(
+        	'http' => array(
+        		'method' => 'POST',
+        		'header' => 'Content-type: application/x-www-form-urlencoded',
+        		'content' => http_build_query($post_params)
+        		))));
+        $jsonResponse = Zend_JSON::decode($response);
+
+        if($jsonResponse['success']==false)
+            die('getchallenge failed:'.$jsonResponse['error']['errorMsg']);
+
+
+        $this->sessionId = $jsonResponse['result']['sessionName'];
+        $this->userId = $jsonResponse['result']['userId'];
 	}
 
 }
