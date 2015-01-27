@@ -48,4 +48,26 @@ class VtigerOperations {
         $this->userId = $jsonResponse['result']['userId'];
 	}
 
+	public function importDocument($documentParams) {
+		$moduleName = "Documents";
+		$objectJson = Zend_JSON::encode($documentParams);
+		$post_params = array(
+			'sessionName' => $this->session_id,
+			'operation' => 'create',
+			'element' => $objectJson,
+			'elementType' => $moduleName);
+
+		$response = file_get_contents($this->endpointUrl, false, stream_context_create(array(
+        	'http' => array(
+        		'method' => 'POST',
+        		'header' => 'Content-type: application/x-www-form-urlencoded',
+        		'content' => http_build_query($post_params)
+        		))));
+        $jsonResponse = Zend_JSON::decode($response);
+        $savedObject = $jsonResponse['result'];
+        $id = $savedObject['id']; 
+        $id = str_replace("13x", "", $id);
+        return $id;
+	}
+
 }
