@@ -1,6 +1,7 @@
 <?php
 
 ini_set('include_path', get_include_path() . PATH_SEPARATOR . dirname(__FILE__));
+error_reporting(E_ALL);
 require_once "Zend/Json.php";
 
 class VtigerOperations {
@@ -12,8 +13,8 @@ class VtigerOperations {
 	private $challengeToken = "";
 	private $generatedKey = "";
 
-	private $sessionId = "";
-	private $userId = "";
+	public $sessionId = "";
+	public $userId = "";
 
 	public function __construct() {
 		//authentication
@@ -47,15 +48,16 @@ class VtigerOperations {
         $this->sessionId = $jsonResponse['result']['sessionName'];
         $this->userId = $jsonResponse['result']['userId'];
 	}
-
-	public function importDocument($documentParams) {
+/*
+	public function importDocument($documentParams, $filename) {
 		$moduleName = "Documents";
 		$objectJson = Zend_JSON::encode($documentParams);
 		$post_params = array(
-			'sessionName' => $this->session_id,
+			'sessionName' => $this->sessionId,
 			'operation' => 'create',
 			'element' => $objectJson,
-			'elementType' => $moduleName);
+			'elementType' => $moduleName,
+			'file' => $filename);
 
 		$response = file_get_contents($this->endpointUrl, false, stream_context_create(array(
         	'http' => array(
@@ -67,7 +69,34 @@ class VtigerOperations {
         $savedObject = $jsonResponse['result'];
         $id = $savedObject['id']; 
         $id = str_replace("13x", "", $id);
-        return $id;
+        return $response;
+	}*/
+
+	public function importDocument($documentParams, $filename) {
+		$fileNameWithPath = realpath($filename);
+		$moduleName = "Documents";
+		$objectJson = Zend_JSON::encode($documentParams);
+		$post_params = array(
+			'sessionName' => $this->sessionId,
+			'operation' => 'create',
+			'element' => $objectJson,
+			'elementType' => $moduleName,
+			'file' => '@'.$fileNameWithPath
+			);
+
+		$ci = curl_init();
+		curl_setopt($ci, CURLOPT_URL, $this->endpointUrl);
+		curl_setopt($ci, CURLOPT_RETURNTRANSFER, 1);
+    	curl_setopt($ci, CURLOPT_FORBID_REUSE, 0);
+    	curl_setopt($ci, CURLOPT_CUSTOMREQUEST, 'POST');
+    	curl_setopt($ci, CURLOPT_POSTFIELDS, $post_params);
+    	$result = curl_exec($ci);
+    	return $result;
+	}
+
+	public function sendQuery($query) {
+		$response = file_get_contents($this->endpointUrl."?operation=query&sessionName=".$this->sessionId."&query=".$query);
+		return $response;
 	}
 
 }
