@@ -1,27 +1,34 @@
 <?php
 
 require('classes/VtigerOperations.php');
+require('classes/Documents.php');
 
 $vtiger = new VtigerOperations();
 
-
-$filesize = filesize("test_import.pdf");
-
-//just testing
-$documentParams = array(
-	'notes_title' => 'Test Import',
-	'assigned_user_id' => $vtiger->userId,
-	'filetype' => 'file',
-	'filesize' => $filesize,
-	'filelocationtype' => 'I',
-	'filestatus' => 1,
-	'filename' => 'test_import.pdf',
-	'folderid' => '22x277'
-	);
+$documents = new Documents;
+$documentsList = $documents->getDocumentList();
 
 
+foreach($documentsList as $name) {
+	$noUrlName = urldecode($name);
+	if(substr($noUrlName, -3) === "pdf" ) {
+		file_put_contents("docs/".$noUrlName, fopen($documents->documentsUrl.$name, 'r'));
+		$filesize = filesize("docs/".$noUrlName);
 
-$testOutput = $vtiger->importDocument($documentParams, "test_import.pdf");
-print_r($testOutput);
+		$documentParams = array(
+			'notes_title' => $noUrlName,
+			'assigned_user_id' => $vtiger->userId,
+			'filetype' => 'file',
+			'filesize' => $filesize,
+			'filelocationtype' => 'I',
+			'filestatus' => 1,
+			'filename' => $noUrlName,
+			'folderid' => '22x277'
+		);
+		$testOutput = $vtiger->importDocument($documentParams, "docs/".$noUrlName);
+		print_r($testOutput);
+	}
+		
+}
 
 ?>
