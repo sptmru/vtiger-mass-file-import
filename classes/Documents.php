@@ -4,7 +4,7 @@ require_once('simple_html_dom.php');
 
 class Documents {
 
-	public $documentsUrl = "http://www.ejwelch.org/quotes%20from%20sharepoint/Quotes%20from%20SP/";
+	public $documentsUrl = "http://www.documents.org/docs/";
 
 	public function getDocumentList() {
 		$result = array();

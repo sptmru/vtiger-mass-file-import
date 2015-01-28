@@ -6,9 +6,9 @@ require_once "Zend/Json.php";
 
 class VtigerOperations {
 
-	private $endpointUrl = "http://www.ejwelch.org/webservice.php";
-	private $username = "kchmela";
-	private $userAccessKey = "6Rk1D2ODBnHksWri";
+	private $endpointUrl = "http://www.vtiger.com/webservice.php";
+	private $username = "username";
+	private $userAccessKey = "accesskey";
 
 	private $challengeToken = "";
 	private $generatedKey = "";
@@ -48,29 +48,6 @@ class VtigerOperations {
         $this->sessionId = $jsonResponse['result']['sessionName'];
         $this->userId = $jsonResponse['result']['userId'];
 	}
-/*
-	public function importDocument($documentParams, $filename) {
-		$moduleName = "Documents";
-		$objectJson = Zend_JSON::encode($documentParams);
-		$post_params = array(
-			'sessionName' => $this->sessionId,
-			'operation' => 'create',
-			'element' => $objectJson,
-			'elementType' => $moduleName,
-			'file' => $filename);
-
-		$response = file_get_contents($this->endpointUrl, false, stream_context_create(array(
-        	'http' => array(
-        		'method' => 'POST',
-        		'header' => 'Content-type: application/x-www-form-urlencoded',
-        		'content' => http_build_query($post_params)
-        		))));
-        $jsonResponse = Zend_JSON::decode($response);
-        $savedObject = $jsonResponse['result'];
-        $id = $savedObject['id']; 
-        $id = str_replace("13x", "", $id);
-        return $response;
-	}*/
 
 	public function importDocument($documentParams, $filename) {
 		$fileNameWithPath = realpath($filename);
