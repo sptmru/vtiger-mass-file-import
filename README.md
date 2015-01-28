@@ -4,7 +4,7 @@ It's a mass documents importer script for [vTiger](https://www.vtiger.com/).
 
 ## Documentation
 
-Documentation will be provided soon.
+Just change the class variables in classes/VtigerOperations.php -- and it's ready.
 
 ## Reporting bugs
 
